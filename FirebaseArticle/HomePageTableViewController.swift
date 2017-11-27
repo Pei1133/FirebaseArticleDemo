@@ -63,10 +63,13 @@ class HomePageTableViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! HomePageTableViewCell
-        cell.titleLabel.text = self.articles[indexPath.row].title
-        cell.contentLabel.text = self.articles[indexPath.row].content
-        cell.dateLabel.text = self.articles[indexPath.row].date
-        cell.authorButton.titleLabel?.text = self.articles[indexPath.row].author
+        
+        let article = articles[indexPath.row]
+
+            cell.titleLabel.text = self.articles[indexPath.row].title
+            cell.contentLabel.text = self.articles[indexPath.row].content
+            cell.dateLabel.text = self.articles[indexPath.row].date
+            cell.authorButton.setTitle(article.author, for: .normal)
         return cell
     }
 }
