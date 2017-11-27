@@ -1,4 +1,4 @@
-//
+//na
 //  AddArticleViewController.swift
 //  FirebaseArticle
 //
@@ -15,26 +15,52 @@ class AddArticleViewController: UIViewController {
     @IBOutlet weak var titleTextField: UITextField!
     
     override func viewDidLoad() {
-//        self.edgesForExtendedLayout = []
+        super.viewDidLoad()
     }
     
-    // MARK: - Callback
-    // 新增節點資料
     @IBAction func goSave(_ sender: Any) {
 
-        let uid = Auth.auth().currentUser?.uid
-        let ref = Database.database().reference().child("users")
-        let articleRef = ref.child(uid!).child("articles").childByAutoId()
+        guard
+            let uid = Auth.auth().currentUser?.uid
+            else { return }
+        let ref = Database.database().reference()
+        let articleRef = ref.child("articles").childByAutoId()
+        let authorRef = ref.child("users").child(uid)
+        
         
         guard let title = self.titleTextField.text, let content = self.articleTxtView.text else{
             print("Form is not valid")
             return
         }
+        authorRef.observe(.value) { (snapshot) in
+            if let value = snapshot.value as? [String : Any]{
+                let author = value["author"] as! String
+            }
+            
+        }
         
-        let value = ["title": title, "content": content, "publish date": "\(Date())"]
+//        print("author \(author)")
+        
+        let value = [
+            "title": title,
+            "content": content,
+            "publish date": "\(Date())",
+//            "author": author
+        ] as [String : Any]
         articleRef.setValue(value)
         
         self.navigationController?.popViewController(animated: true)
         
     }
 }
+
+//    func getAuthorName() {
+//        let uid = Auth.auth().currentUser?.uid
+//        Database.database().reference().child(“users”).child(uid!).observeSingleEvent(of: .value, with: { (snapShot) in
+//            guard let dictionary = snapShot.value as? [String: AnyObject] else { return }
+//            guard let authorFirstName = dictionary[“firstName”] as? String else { return }
+//            guard let authorLasttName = dictionary[“lastName”] as? String else { return }
+//            self.authorName = “\(authorFirstName) \(authorLasttName)”
+//        })
+//    }
+

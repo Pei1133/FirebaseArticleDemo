@@ -9,54 +9,65 @@
 import UIKit
 import Firebase
 
-//struct Article {
-//    let id: String
-////    let title: String
-////    let content: String
-////    let date: String
-////    let author: String
-//}
-//
-//class HomePageTableViewController: UITableViewController {
-//    
-//    var articles: [Article] = []
-//    
-////    override func viewDidLoad() {
-////        super.viewDidLoad()
-////        Database.database().reference().observe(.childAdded) { (snapshot) in
-//////            self.publishArticles = []
-////            if snapshot.childrenCount > 0 {
-////                var dataList: [Article] = [Article]()
-////
-////                for item in snapshot.children {
-//////                    let data = Article(snapshot: item as! DataSnapshot)
-//////                    self.articles.append(data)
-//////                    , title: <#String#>, content: <#String#>, date: <#String#>, author:
-////                }
-////
-////                self.articles = dataList
-////                self.tableView.reloadData()
-//            }
-//        }
-//    }
-//
-//    override func didReceiveMemoryWarning() {
-//        super.didReceiveMemoryWarning()
-//    }
-//
-//    override func numberOfSections(in tableView: UITableView) -> Int {
-//        return 1
-//    }
-//
-//    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-//        return articles.count
-//    }
-//
-//    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-//        let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "cell")
-//        cell.textLabel?.text = self.articles[indexPath.row].id
-//        //        cell.detailTextLabel?.text = publishArticles[indexPath.row].author + "   " + publishArticles[indexPath.row].date
-//        return cell
-//    }
-//}
+class Article {
+    var title: String = ""
+    var content: String = ""
+    var date: String = ""
+    var author: String = ""
+    let ref: DatabaseReference!
+    
+    init(snapshot: DataSnapshot) {
+        self.ref = snapshot.ref
+        if let value = snapshot.value as? [String : Any] {
+            self.title = value["title"] as! String
+            self.content = value["content"] as! String
+            self.date = value["publish date"] as! String
+            self.author = value["author"] as! String
+        }
+    }
+}
+
+class HomePageTableViewController: UITableViewController {
+    
+    var articles: [Article] = []
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+    }
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        Database.database().reference().child("articles").observe(.value) { (snapshot) in
+            self.articles.removeAll()
+            
+            for child in snapshot.children {
+                let childrenSnapshot = child as! DataSnapshot
+                let article = Article(snapshot: childrenSnapshot)
+                self.articles.insert(article, at: 0)
+            }
+            self.tableView.reloadData()
+        }
+    }
+    
+
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+    }
+
+    override func numberOfSections(in tableView: UITableView) -> Int {
+        return 1
+    }
+
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return articles.count
+    }
+
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! HomePageTableViewCell
+        cell.titleLabel.text = self.articles[indexPath.row].title
+        cell.contentLabel.text = self.articles[indexPath.row].content
+        cell.dateLabel.text = self.articles[indexPath.row].date
+        cell.authorButton.titleLabel?.text = self.articles[indexPath.row].author
+        return cell
+    }
+}
 
