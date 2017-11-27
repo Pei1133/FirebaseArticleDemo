@@ -29,6 +29,19 @@ class Article {
 
 class HomePageTableViewController: UITableViewController {
     
+    @IBAction func logoutButton(_ sender: Any) {
+        do {
+            try Auth.auth().signOut()
+        } catch let logoutError {
+            print(logoutError)
+        }
+        
+        // switch to LoginViewController()
+        let loginController = LoginViewController()
+        present(loginController, animated: true, completion: nil)
+        
+    }
+    
     var articles: [Article] = []
     
     override func viewDidLoad() {
@@ -48,28 +61,28 @@ class HomePageTableViewController: UITableViewController {
         }
     }
     
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
-
+    
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
-
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return articles.count
     }
-
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! HomePageTableViewCell
         
         let article = articles[indexPath.row]
-
-            cell.titleLabel.text = self.articles[indexPath.row].title
-            cell.contentLabel.text = self.articles[indexPath.row].content
-            cell.dateLabel.text = self.articles[indexPath.row].date
-            cell.authorButton.setTitle(article.author, for: .normal)
+        
+        cell.titleLabel.text = self.articles[indexPath.row].title
+        cell.contentLabel.text = self.articles[indexPath.row].content
+        cell.dateLabel.text = self.articles[indexPath.row].date
+        cell.authorButton.setTitle(article.author, for: .normal)
         return cell
     }
 }
