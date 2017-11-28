@@ -43,6 +43,7 @@ class HomePageTableViewController: UITableViewController {
     }
     
     var articles: [Article] = []
+    var articleIds: [String] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -83,7 +84,39 @@ class HomePageTableViewController: UITableViewController {
         cell.contentLabel.text = self.articles[indexPath.row].content
         cell.dateLabel.text = self.articles[indexPath.row].date
         cell.authorButton.setTitle(article.author, for: .normal)
+        cell.authorButton.addTarget(self, action: #selector(userArticles), for: .touchUpInside)
+        cell.likeButton.addTarget(self, action: #selector(likeArticle), for: .touchUpInside)
         return cell
     }
+    
+    
+    
+    @objc func userArticles() {
+        let uid = Auth.auth().currentUser?.uid
+        let ref = Database.database().reference().child("users").child(uid!).child("articles")
+        
+        ref.observe(.value) { (snapshot) in
+            guard
+                let  object = snapshot.value as? [String: Any]
+            else { return }
+            print("test", object)
+            for (key, value) in object {
+                guard let id = value as? String else { continue }
+                self.articleIds.append(id)
+            }
+            print("aaa")
+            print(self.articleIds)
+
+        }
+        print("aaa")
+        print(articleIds)
+    }
+    @objc func likeArticle() {
+        guard let uid = Auth.auth().currentUser?.uid
+            else { return }
+        let ref = Database.database().reference().child("articles").child("like")
+        ref.updateChildValues(["uid" : uid])
+    }
+        
 }
 

@@ -28,6 +28,7 @@ class AddArticleViewController: UIViewController {
             else { return }
         let ref = Database.database().reference()
         let articleRef = ref.child("articles").childByAutoId()
+        let childAutoID = articleRef.key
         //        let authorRef = ref.child("users").child(uid)
         
         
@@ -43,6 +44,10 @@ class AddArticleViewController: UIViewController {
             "author": authorName
             ] as [String : Any]
         articleRef.setValue(value)
+        
+        // store article ids in user
+        let userArticlesReference = ref.child("users").child(uid).child("articles").childByAutoId()
+        userArticlesReference.setValue(childAutoID)
         
         self.navigationController?.popViewController(animated: true)
         
